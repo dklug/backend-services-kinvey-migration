@@ -48,7 +48,9 @@ if (operation === '--login') {
         const configurationMigrator = new ConfigurationMigrator(logger, config);
         configurationMigrator.migrateConfiguration();
     } else if (operation === '--migrate-data') {
+        console.log("Making a dataMigrator from "+logger+" and " +config+"");
         const dataMigrator = new DataMigrator(logger, config);
+        console.log("Attempting to migrate data")
         dataMigrator.migrateDataContent();
     } else if (operation === '--cleanup-dest') {
         const configurationMigrator = new ConfigurationMigrator(logger, config);

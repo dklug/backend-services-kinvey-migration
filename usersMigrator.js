@@ -3,15 +3,15 @@ const async = require('async');
 const _ = require('underscore');
 
 class UserMigrator {
-    constructor(bsApi, kinveyApi, logger, config) {
+    constructor(bsApi, /*kinveyApi,*/ logger, config) {
         this.backendServicesApi = bsApi;
-        this.kinveyServiceApi = kinveyApi;
+        //this.kinveyServiceApi = kinveyApi;
         this.logger = logger;
         this.config = config;
     }
 
-    migrateUsers(kinveyRoles, bsRoles) {
-        return this._migrateUsers(kinveyRoles, bsRoles)
+    migrateUsers(/*kinveyRoles,*/ bsRoles) {
+        return this._migrateUsers(/*kinveyRoles,*/ bsRoles)
             .then(() => {
                 return Promise.resolve();
             })
@@ -20,7 +20,7 @@ class UserMigrator {
             });
     }
 
-    _migrateUsers(kinveyRoles, bsRoles) {
+    _migrateUsers(/*kinveyRoles,*/ bsRoles) {
         let self = this;
 
         const pageSize = this.config.page_size_users;

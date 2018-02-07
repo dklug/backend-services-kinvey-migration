@@ -1,11 +1,10 @@
 const async = require('async');
 
 class FilesMigrator {
-    constructor(bsApi, kinveyApi, logger, config) {
+    constructor(bsApi, logger, config) {
         this.logger = logger;
         this.config = config;
         this.backendservicesApi = bsApi;
-        this.kinveyApi = kinveyApi;
     }
 
     migrateFiles() {
@@ -31,7 +30,8 @@ class FilesMigrator {
                                 },
                                 (items, cb2) => {
                                     fetchedItemsCount = items.length;
-                                    self.kinveyApi.insertFilesInKinvey(items, cb2);
+                                    alert(JSON.stringify(items));
+                                    //self.kinveyApi.insertFilesInKinvey(items, cb2);
                                 }
                             ],
                             callback

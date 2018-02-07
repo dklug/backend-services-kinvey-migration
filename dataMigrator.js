@@ -1,10 +1,10 @@
 'use strict';
 
 const BackEndServicesApi = require('./backendServicesApi');
-const KinveyServiceApi = require('./kinveyServiceApi');
+//const KinveyServiceApi = require('./kinveyServiceApi');
 const FilesMigrator = require('./filesMigrator');
 const utils = require('./utils');
-const UsersMigrator = require('./usersMigrator');
+//const UsersMigrator = require('./usersMigrator');
 const config = require('./config');
 
 const async = require('async');
@@ -14,24 +14,25 @@ class DataMigrator {
     constructor(logger, config) {
         this.logger = logger;
         this.config = config;
-        this.kinveyServiceApi = new KinveyServiceApi(this.logger, this.config);
+        //this.kinveyServiceApi = new KinveyServiceApi(this.logger, this.config);
         this.backendServicesApi = new BackEndServicesApi(this.logger, this.config);
-        this.filesMigrator = new FilesMigrator(this.backendServicesApi, this.kinveyServiceApi, this.logger, this.config);
-        this.usersMigrator = new UsersMigrator(this.backendServicesApi, this.kinveyServiceApi, this.logger, this.config);
+        this.filesMigrator = new FilesMigrator(this.backendServicesApi, this.logger, this.config);
+        //this.usersMigrator = new UsersMigrator(this.backendServicesApi, this.logger, this.config);
     }
 
     migrateDataContent() {
         let typesMetaData;
-        let kinveyRoles = {};
+        //let kinveyRoles = {};
         let bsRoles = {};
         return new Promise((resolve, reject) => {resolve()})
             .then(() => {
                 return utils.checkConfiguration(this.logger, this.config);
             })
+            // .then(() => {
+            //     return this.kinveyServiceApi.checkManagementAuthorization();
+            // })
             .then(() => {
-                return this.kinveyServiceApi.checkManagementAuthorization();
-            })
-            .then(() => {
+                console.log("Returning backendServicesApi.getTypes()");
                 return this.backendServicesApi.getTypes();
             })
             .then((types) => {
@@ -44,25 +45,25 @@ class DataMigrator {
             .then(() => {
                 return this.backendServicesApi.getRoles();
             })
-            .then((roles) => {
-                roles.Result.forEach((role) => {
-                    bsRoles[role.Id] = role.Name;
-                });
+            // .then((roles) => {
+            //     roles.Result.forEach((role) => {
+            //         bsRoles[role.Id] = role.Name;
+            //     });
 
-                return this.kinveyServiceApi.getRoles();
-            })
-            .then((roles) => {
-                roles.forEach((role) => {
-                    kinveyRoles[role.name] = role._id;
-                });
-                return this._migrateTypes(typesMetaData, kinveyRoles, bsRoles);
-            })
+            //     return this.kinveyServiceApi.getRoles();
+            // })
+            // .then((roles) => {
+            //     roles.forEach((role) => {
+            //         kinveyRoles[role.name] = role._id;
+            //     });
+            //     return this._migrateTypes(typesMetaData, kinveyRoles, bsRoles);
+            // })
             .then(() => {
                 return this.filesMigrator.migrateFiles();
             })
-            .then(() => {
-                return this.usersMigrator.migrateUsers(kinveyRoles, bsRoles);
-            })
+            // .then(() => {
+            //     return this.usersMigrator.migrateUsers(kinveyRoles, bsRoles);
+            // })
             .then(() => {
                 this.logger.info('\nData migration completed.');
             })
@@ -71,13 +72,13 @@ class DataMigrator {
             });
     }
 
-    _migrateTypes(types, kinveyRoles, bsRoles) {
+    _migrateTypes(types, /*kinveyRoles,*/ bsRoles) {
         return Promise.mapSeries(types, (type) => {
-            return this._migrateSingleType(type, kinveyRoles, bsRoles);
+            return this._migrateSingleType(type, /*kinveyRoles,*/ bsRoles);
         });
     }
 
-    _migrateSingleType(type, kinveyRoles, bsRoles) {
+    _migrateSingleType(type, /*kinveyRoles,*/ bsRoles) {
         const self = this;
         const pageSize = self.config.page_size_data;
         let pageIndex = 0;
@@ -94,7 +95,7 @@ class DataMigrator {
             return new Promise((resolve, reject) => {
                 async.doUntil(
                     (cb) => {
-                        const collectionName = utils.convertCollectionNameToKinvey(type.Name);
+                        //const collectionName = utils.convertCollectionNameToKinvey(type.Name);
                         if (collectionName !== type.Name) {
                             self.logger.warn(`  WARNING: Invalid collection name. Migrating items to "${collectionName}" instead`);
                         }
