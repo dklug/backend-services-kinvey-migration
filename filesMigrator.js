@@ -74,6 +74,10 @@ class FilesMigrator {
 }
 
 function downloadURI(uri, name, cbk) {
+    if (!fs.existsSync('files'))
+    {
+        fs.mkdirSync('files');
+    }
     request(uri).pipe(fs.createWriteStream('files/'+name))
 }
 
