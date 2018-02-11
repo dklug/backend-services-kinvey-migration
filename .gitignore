@@ -3,3 +3,4 @@ node_modules
 migration-error.log
 config.json
 files
+json
