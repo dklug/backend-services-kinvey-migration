@@ -66,9 +66,11 @@ class DataMigrator {
             // })
             .then(() => {
                 this.logger.info('\nData migration completed.');
+                console.log('Data migration completed.');
             })
             .catch((dataMigrationError) => {
                 this.logger.error(dataMigrationError.message);
+                console.log(dataMigrationError.message);
             });
     }
 

@@ -14,13 +14,9 @@ class BackendServicesApi {
     }
 
     getTypes() {
-        console.log("backendServicesApi.getTypes()");
         const headers = {};
-        console.log("test1");
         const filter = {Kind: 2, DataLinkId: null};
-        console.log("test2");
         headers['x-everlive-filter'] = JSON.stringify(filter);
-        console.log("test3");
 
         return this.makeBSMetadataRequest('GET', '/Types', headers);
     }
@@ -154,7 +150,6 @@ class BackendServicesApi {
     }
 
     makeBSMetadataRequest(method, path, headers) {
-        console.log("makeBSMetadataRequest");
         headers = headers || {};
         headers['Authorization'] = `Masterkey ${this.config.bs_master_key}`;
 

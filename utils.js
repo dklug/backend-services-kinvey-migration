@@ -7,7 +7,6 @@ function Utils() {
 }
 
 Utils.makeRequest = function (options) {
-    console.log("Utils.makeRequest");
     return request(options)
         .then((response) => {
             return response;
