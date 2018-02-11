@@ -1,6 +1,6 @@
 const async = require('async');
 var fs = require('fs');
-var http = require('https');
+var request = require('request');
 
 class FilesMigrator {
     constructor(bsApi, logger, config) {
@@ -34,11 +34,11 @@ class FilesMigrator {
                                     fetchedItemsCount = items.length;
                                     //console.log(JSON.stringify(items));
                                     console.log("items.Uri: " + JSON.stringify(items[1].Uri)+" ...items.Filename: "+items[1].Filename);
-                                    // items.forEach((item,index,cb3) => {
-                                    //     downloadURI(item.Uri,item.Filename,cb3);
-                                    // });
+                                    items.forEach((item,index,cb3) => {
+                                        downloadURI(item.Uri,item.Filename,cb3);
+                                    });
 
-                                    downloadURI(items[1].Uri, items[1].Filename, cb2);
+                                    //downloadURI(items[1].Uri, items[1].Filename, cb2);
                                     //alert(JSON.stringify(items));
                                     //self.kinveyApi.insertFilesInKinvey(items, cb2);
                                 }
@@ -74,14 +74,7 @@ class FilesMigrator {
 }
 
 function downloadURI(uri, name, cbk) {
-    if (uri==undefined || name==undefined){cbk;}
-    var file = fs.createWriteStream('files/'+name);
-    var request = http.get(uri,function(response){
-        console.log('should be 200: '+response.statusCode);
-        file.on('finish',function(){
-            file.close(cbk);
-        })
-    });
+    request(uri).pipe(fs.createWriteStream('files/'+name))
 }
 
 module.exports = FilesMigrator;
