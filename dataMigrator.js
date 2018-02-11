@@ -10,6 +10,8 @@ const config = require('./config');
 const async = require('async');
 const Promise = require('bluebird');
 
+var fs = require('fs');
+
 class DataMigrator {
     constructor(logger, config) {
         this.logger = logger;
@@ -32,7 +34,6 @@ class DataMigrator {
             //     return this.kinveyServiceApi.checkManagementAuthorization();
             // })
             .then(() => {
-                console.log("Returning backendServicesApi.getTypes()");
                 return this.backendServicesApi.getTypes();
             })
             .then((types) => {
@@ -45,19 +46,24 @@ class DataMigrator {
             .then(() => {
                 return this.backendServicesApi.getRoles();
             })
-            // .then((roles) => {
-            //     roles.Result.forEach((role) => {
-            //         bsRoles[role.Id] = role.Name;
-            //     });
+            .then((roles) => {
+                console.log('.then((roles) 1');
+                console.log(roles);
+                roles.Result.forEach((role) => {
+                    console.log('role.name: '+role.Name);
+                    bsRoles[role.Id] = role.Name;
+                });
 
-            //     return this.kinveyServiceApi.getRoles();
-            // })
-            // .then((roles) => {
-            //     roles.forEach((role) => {
-            //         kinveyRoles[role.name] = role._id;
-            //     });
-            //     return this._migrateTypes(typesMetaData, kinveyRoles, bsRoles);
-            // })
+                //return this.kinveyServiceApi.getRoles();
+            })
+            .then((roles) => {
+                console.log('.then((roles) 2');
+                // roles.forEach((role) => {
+                //     console.log(role._id);
+                //     //kinveyRoles[role.name] = role._id;
+                // });
+                return this._migrateTypes(typesMetaData, /*kinveyRoles,*/ bsRoles);
+            })
             .then(() => {
                 return this.filesMigrator.migrateFiles();
             })
@@ -81,6 +87,8 @@ class DataMigrator {
     }
 
     _migrateSingleType(type, /*kinveyRoles,*/ bsRoles) {
+        console.log ('_migrateSingleType - type: '+type+', bsRoles: '+bsRoles);
+
         const self = this;
         const pageSize = self.config.page_size_data;
         let pageIndex = 0;
@@ -98,13 +106,19 @@ class DataMigrator {
                 async.doUntil(
                     (cb) => {
                         //const collectionName = utils.convertCollectionNameToKinvey(type.Name);
+                        const collectionName = type.Name;
                         if (collectionName !== type.Name) {
                             self.logger.warn(`  WARNING: Invalid collection name. Migrating items to "${collectionName}" instead`);
                         }
                         this.backendServicesApi.readItemsFromBS(type, pageIndex * pageSize, pageSize)
                             .then((items) => {
                                 fetchedItemsCount = items.length;
-                                return this.kinveyServiceApi.insertItems(collectionName, items, kinveyRoles, bsRoles);
+                                if (!fs.existsSync('json'))
+                                {
+                                    fs.mkdirSync('json');
+                                }
+                                fs.writeFileSync('json/'+collectionName+'.json',JSON.stringify(items));
+                                //return this.kinveyServiceApi.insertItems(collectionName, items, kinveyRoles, bsRoles);
                             })
                             .then(() => {
                                 cb();
